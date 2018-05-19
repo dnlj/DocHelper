@@ -1,0 +1,25 @@
+# Configuration file for EditorConfig (http://editorconfig.org)
+
+# Mark as root file
+root = true
+
+# Apply to all files
+[*]
+
+# Indentation style
+indent_style = tab
+
+# Indentation size
+indent_size = 4
+
+# Line ending format
+end_of_line = lf
+
+# File character encoding
+charset = utf-8
+
+# Is whitespace allowed at the end of lines
+trim_trailing_whitespace = true
+
+# Should files end with a new line
+insert_final_newline = true
