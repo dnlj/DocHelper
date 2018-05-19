@@ -73,13 +73,26 @@ namespace DocHelper {
 			if (afterIndent) {
 				var afterCursor = lineText.Substring(cursorPos);
 				var afterCursorTrim = afterCursor.TrimStart();
-				var afterCursorIndex = afterCursor.Length - afterCursorTrim.Length;
 
 				string append = isCommentStart ? " * " : "* ";
 
 				if (afterCursorTrim.StartsWith("*")) {
+					// Dont add an extra asterisk if there is already one there
 					append = append.Substring(0, append.Length - 2);
-					// TODO: Trim all the (cursorPos, cursorPos + afterCursorIndex)
+					var afterLength = afterCursor.Length - afterCursorTrim.Length;
+					edit.Delete(change.NewEnd, afterLength);
+
+					// Add a space after if needed
+					var nextCharIndex = cursorPos + afterLength + 1;
+					char nextChar = '\0';
+
+					if (nextCharIndex < lineText.Length) {
+						nextChar = lineText[nextCharIndex];
+					}
+
+					if (nextChar != '/' && !char.IsWhiteSpace(nextChar)) {
+						edit.Insert(change.NewEnd + afterLength + 1, "~");
+					}
 				}
 
 				edit.Insert(change.NewEnd, lineText.Substring(0, indentIndex) + append);
