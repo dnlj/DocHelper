@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Text;
+using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using System;
 using System.Collections.Generic;
@@ -41,56 +41,66 @@ namespace DocHelper {
 			// Skip invalid changes
 			if (!IsNewLine(change.NewText[0])) { return; }
 
-			var snap = view.TextSnapshot;
-			var oldLine = snap.GetLineFromPosition(change.OldPosition);
-			var oldLineText = oldLine.GetText();
-			var oldLineIndex = 0;
+			// Useful variables
+			var line = view.TextSnapshot.GetLineFromPosition(change.OldPosition);
+			var lineText = line.GetText();
+			var lineTextTrimmed = lineText.TrimStart();
+			int indentIndex = lineText.Length - lineTextTrimmed.Length;
+			var cursorPos = change.OldPosition - line.Start.Position;
 
-			// Get the position of the start of the text of the old line
-			for (; oldLineIndex < oldLineText.Length; ++oldLineIndex) {
-				if (!Char.IsWhiteSpace(oldLineText, oldLineIndex)) { break; }
+			// Determine where we are in the comment
+			var inComment = false;
+			var isCommentStart = false;
+			var afterIndent = cursorPos > indentIndex;
+
+			if (IsDocCommentStart(lineTextTrimmed)) {
+				isCommentStart = true;
+				inComment = afterIndent;
+			} else {
+				inComment = InDocComment(change);
+
+				if (inComment && IsDocCommentEnd(lineTextTrimmed)) {
+					inComment = !afterIndent;
+				}
 			}
 
-			var oldLineTextStart = oldLineText.Substring(oldLineIndex, oldLineText.Length - oldLineIndex);
+			// Skip if we are not in a comment
+			if (!inComment) { return; }
 
-			// Check if we need to append anything
-			string append = null;
+			// Perform the edit
+			var edit = view.TextBuffer.CreateEdit();
 
-			if (oldLineTextStart.StartsWith("*") && !oldLineTextStart.StartsWith("*/") && InDocComment(change)) {
-				append = "* ";
-			} else if (IsDocCommentStart(oldLineTextStart)) {
-				append = " * ";
-			}
+			if (afterIndent) {
+				var afterCursor = lineText.Substring(cursorPos);
+				var afterCursorTrim = afterCursor.TrimStart();
+				var afterCursorIndex = afterCursor.Length - afterCursorTrim.Length;
 
-			// Apply an edit if needed
-			if (append != null) {
-				var edit = view.TextBuffer.CreateEdit();
-				var oldLinePos = oldLine.Start.Position;
-				var restOfLine = snap.GetText(change.OldPosition, oldLinePos + oldLine.Length - change.OldPosition);
+				string append = isCommentStart ? " * " : "* ";
 
-				// TODO: Need to handle the case where the cursor is in front of the first *
-				// Dont add a * if there is already one there
-				if (restOfLine.StartsWith("*")) {
+				if (afterCursorTrim.StartsWith("*")) {
 					append = append.Substring(0, append.Length - 2);
+					// TODO: Trim all the (cursorPos, cursorPos + afterCursorIndex)
 				}
 
-				// Apply the edit
-				edit.Insert(change.NewEnd, oldLineText.Substring(0, oldLineIndex) + append);
-				edit.Apply();
+				edit.Insert(change.NewEnd, lineText.Substring(0, indentIndex) + append);
+			} else {
+				edit.Insert(change.OldPosition, lineText.Substring(cursorPos, indentIndex - cursorPos) + "* ");
+				edit.Insert(change.NewEnd, lineText.Substring(0, cursorPos));
 			}
+
+			edit.Apply();
 		}
-		
+
 		private bool InDocComment(ITextChange change) {
 			var snap = view.TextSnapshot;
 			var curLine = snap.GetLineNumberFromPosition(change.OldPosition);
 
-			while (curLine != 0) {
-				var prevLineText = snap.GetLineFromLineNumber(curLine - 1).GetText().TrimStart();
+			while (curLine-- != 0) {
+				var lineText = snap.GetLineFromLineNumber(curLine).GetText().TrimStart();
 
-				if (prevLineText.StartsWith("*")) {
-					--curLine;
+				if (lineText.StartsWith("*")) {
 					continue;
-				} else if (IsDocCommentStart(prevLineText)) {
+				} else if (IsDocCommentStart(lineText)) {
 					return true;
 				} else {
 					return false;
@@ -104,7 +114,11 @@ namespace DocHelper {
 			return line.StartsWith("/**") // JavaDoc style
 				|| line.StartsWith("/*!");// Qt style
 		}
-		
+
+		private bool IsDocCommentEnd(string line) {
+			return line.StartsWith("*/");
+		}
+
 		private bool IsNewLine(char c) {
 			return c == '\u000A' // LF
 				|| c == '\u000D' // CR
