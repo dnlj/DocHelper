@@ -58,7 +58,7 @@ namespace DocHelper {
 
 			if (oldLineTextStart.StartsWith("*") && !oldLineTextStart.StartsWith("*/") && InDocComment(change)) {
 				append = "* ";
-			} else if (oldLineTextStart.StartsWith("/**")) {
+			} else if (IsDocCommentStart(oldLineTextStart)) {
 				append = " * ";
 			}
 
@@ -90,7 +90,7 @@ namespace DocHelper {
 				if (prevLineText.StartsWith("*")) {
 					--curLine;
 					continue;
-				} else if (prevLineText.StartsWith("/**")) {
+				} else if (IsDocCommentStart(prevLineText)) {
 					return true;
 				} else {
 					return false;
@@ -98,6 +98,11 @@ namespace DocHelper {
 			}
 
 			return false;
+		}
+
+		private bool IsDocCommentStart(string line) {
+			return line.StartsWith("/**") // JavaDoc style
+				|| line.StartsWith("/*!");// Qt style
 		}
 		
 		private bool IsNewLine(char c) {
