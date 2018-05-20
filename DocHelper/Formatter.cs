@@ -87,7 +87,7 @@ namespace DocHelper {
 					}
 
 					if (nextChar != '/' && !char.IsWhiteSpace(nextChar)) {
-						edit.Insert(change.NewEnd + afterLength + 1, "~");
+						edit.Insert(change.NewEnd + afterLength + 1, " ");
 					}
 				}
 
