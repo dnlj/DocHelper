@@ -104,11 +104,10 @@ namespace DocHelper {
 			var snap = view.TextSnapshot;
 			var curLine = snap.GetLineNumberFromPosition(change.OldPosition);
 
-			while (curLine-- != 0) {
+			for (;  curLine != 0; --curLine) {
 				var lineText = snap.GetLineFromLineNumber(curLine).GetText().TrimStart();
 
 				if (lineText.StartsWith("*")) {
-					continue;
 				} else if (IsDocCommentStart(lineText)) {
 					return true;
 				} else {
