@@ -3,7 +3,7 @@
     <Metadata>
         <Identity Id="DocHelper.6124a458-1908-4f68-aa36-967f707048b8" Version="1.0" Language="en-US" Publisher="dnlj" />
         <DisplayName>DocHelper</DisplayName>
-        <Description xml:space="preserve">TODO: Description</Description>
+        <Description xml:space="preserve">Extension for automatically adding asterisks to new lines of JavaDoc and Qt style comments.</Description>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0, 16.0)" />
