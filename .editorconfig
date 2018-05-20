@@ -13,7 +13,7 @@ indent_style = tab
 indent_size = 4
 
 # Line ending format
-end_of_line = lf
+# end_of_line = lf
 
 # File character encoding
 charset = utf-8
