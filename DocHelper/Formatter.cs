@@ -2,7 +2,6 @@ using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using System;
 
-
 namespace DocHelper {
 	class Formatter {
 		private IWpfTextView view;
