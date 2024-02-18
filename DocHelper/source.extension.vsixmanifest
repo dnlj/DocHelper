@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="DocHelper.6124a458-1908-4f68-aa36-967f707048b8" Version="1.1" Language="en-US" Publisher="dnlj" />
+        <Identity Id="DocHelper.6124a458-1908-4f68-aa36-967f707048b8" Version="1.2" Language="en-US" Publisher="dnlj" />
         <DisplayName>DocHelper</DisplayName>
         <Description xml:space="preserve">Extension for automatically adding asterisks to new lines of JavaDoc and Qt style comments.</Description>
+        <Preview>true</Preview>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[15.0,)">
